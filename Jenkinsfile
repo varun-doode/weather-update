@@ -7,7 +7,7 @@ pipeline {
         stage('checkout') {
             steps {
                
-                sh 'git clone https://github.com/varun-doode/bus_booking.git'
+                sh 'git clone https://github.com/varun-doode/weather-update.git'
             }
         }
 
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     // Run the JAR file using java -jar
-                    sh "nohup timeout 10s java -jar target/bus-booking-app-1.0-SNAPSHOT.jar > output.log 2>&1 &"
+                    sh "nohup timeout 10s java -jar target/weather-update-app-1.0-SNAPSHOT.jar > output.log 2>&1 &"
                     // Sleep for a while to allow the application to start (adjust as needed)
                     sleep 10
                 }
@@ -43,7 +43,7 @@ pipeline {
         stage('deploy') {
             steps {
                 sh 'ssh root@172.31.42.29'
-                sh "scp /home/slave1/workspace/Busbooking_develop/target/bus-booking-app-1.0-SNAPSHOT.jar root@172.31.42.29:/opt/apache-tomcat-8.5.98/webapps/"
+                sh "scp /home/slave1/workspace/weather-update_develop/target/bus-booking-app-1.0-SNAPSHOT.jar root@172.31.42.29:/opt/apache-tomcat-8.5.98/webapps/"
             }
         }
         
