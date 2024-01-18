@@ -6,7 +6,7 @@ pipeline {
        stages {
         stage('checkout') {
             steps {
-               
+                sh 'rm -rf weather-update_Develop'
                 sh 'git clone https://github.com/varun-doode/weather-update.git'
             }
         }
@@ -43,7 +43,7 @@ pipeline {
         stage('deploy') {
             steps {
                 sh 'ssh root@172.31.42.29'
-                sh "scp /home/slave1/workspace/weather-update_develop/target/bus-booking-app-1.0-SNAPSHOT.jar root@172.31.42.29:/opt/apache-tomcat-8.5.98/webapps/"
+                sh "scp /home/slave1/workspace/weather-update_Develop/target/weather-forecast-app-1.0-SNAPSHOT.jar root@172.31.42.29:/opt/apache-tomcat-8.5.98/webapps/"
             }
         }
         
