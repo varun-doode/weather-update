@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     // For my understanding, rtUpload is a part of JFrog Artifactory plugin to upload artifacts to artifacts repo
-                    rtUpload (
+                    rtUpload '''(
                         serverId: 'Artifact',
                         spec: {
                             "files": [
@@ -43,7 +43,7 @@ pipeline {
                                     "target": "libs-release-local/"
                                 }
                             ]
-                        }
+                        }'''
                     )
                 }
             }
