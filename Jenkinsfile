@@ -36,14 +36,14 @@ pipeline {
                     // For my understanding, rtUpload is a part of JFrog Artifactory plugin to upload artifacts to artifacts repo
                     rtUpload (
                         serverId: 'Artifact',
-                        spec: '''{
+                        spec: {
                             "files": [
                                 {
                                     "pattern": "target/*.jar",
                                     "target": "libs-release-local/"
                                 }
                             ]
-                        }'''
+                        }
                     )
                 }
             }
