@@ -1,12 +1,9 @@
 pipeline {
-    agent {
-        label 'slave1'
-    }
-
-       stages {
+    agent { label 'slave1' }
+    stages {
         stage('checkout') {
             steps {
-                sh 'rm -rf weather-update_Develop'
+                sh 'rm -rf weather-update'
                 sh 'git clone https://github.com/varun-doode/weather-update.git'
             }
         }
@@ -14,47 +11,51 @@ pipeline {
         stage('build') {
             steps {
                 script {
-                    sh 'mvn --version'
-                    sh 'mvn clean install'
+                    sh "mvn clean install"
                 }
             }
         }
 
-        stage('Show Contents of target') {
+        stage('Deploy to JFrog Artifactory') {
             steps {
+                // Remember this is the step which I followed for free style project.
                 script {
-                    // Print the contents of the target directory
-                    sh 'ls -l target'
+                    rtServer(
+                        id: "Artifact",
+                        url: "http://16.171.32.214:8082/artifactory",
+                        username: "admin",
+                        password: "Admin@1234"
+                    )
                 }
             }
         }
 
-        stage('Run JAR Locally') {
+        stage('Upload') {
             steps {
                 script {
-                    // Run the JAR file using java -jar
-                    sh "nohup timeout 10s java -jar target/weather-update-app-1.0-SNAPSHOT.jar > output.log 2>&1 &"
-                    // Sleep for a while to allow the application to start (adjust as needed)
-                    sleep 10
+                    // For my understanding, rtUpload is a part of JFrog Artifactory plugin to upload artifacts to artifacts repo
+                    rtUpload (
+                        serverId: 'Artifact',
+                        spec: '''{
+                            "files": [
+                                {
+                                    "pattern": "target/*.jar",
+                                    "target": "libs-release-local/"
+                                }
+                            ]
+                        }'''
+                    )
                 }
             }
         }
-        
-        stage('deploy') {
+
+        stage('Publish build info') {
             steps {
-                sh 'ssh root@172.31.42.29'
-                sh "scp /home/slave1/workspace/weather-update_Develop/target/weather-forecast-app-1.0-SNAPSHOT.jar root@172.31.42.29:/opt/apache-tomcat-8.5.98/webapps/"
+                script {
+                    // For my understanding to publish build info
+                    rtPublishBuildInfo serverId: "Artifact"
+                }
             }
-        }
-        
-    }
-        
-    post {
-        success {
-            echo "Build, Run, and Deployment to Tomcat successful!"
-        }
-        failure {
-            echo "Build, Run, and Deployment to Tomcat failed!"
         }
     }
 }
